@@ -3,10 +3,18 @@
 
 using namespace std;
 
-int C = 9, N = 2;
+int C = 3, N = 1;
 int powersets = 1 << ( 2 * C );
 int* prevbuckets;
 int* buckets;
+
+void printBuckets() {
+    int i;
+    for ( i = 0; i < powersets; ++i ) {
+        printf( "%i:\t%i\n", i, buckets[ i ] );
+    }
+    printf( "\n" );
+}
 
 inline int setBricks( int powerset, int row, int value ) {
     return powerset | ( value << 2 * ( C - row ) );
@@ -16,12 +24,12 @@ inline int getBricks( int powerset, int row ) {
     return ( powerset >> 2 * ( C - row ) ) & 4;
 }
 
-int fill( int prevpowerset, int currentpowerset, int j ) {
+void fill( int prevpowerset, int currentpowerset, int j ) {
     if ( j == C ) {
-        buckets[ currentpowerset ] += prevbuckets[ prevbuckets ];
+        buckets[ currentpowerset ] += prevbuckets[ prevpowerset ];
         return;
     }
-    int thisBricks = bricks( prevpowerset, j );
+    int thisBricks = getBricks( prevpowerset, j );
     switch ( thisBricks ) {
         case 0:
             // prev: = =
@@ -49,7 +57,7 @@ int fill( int prevpowerset, int currentpowerset, int j ) {
             //   =
             // = =
             if ( j + 2 <= C
-                 && bricks( prevpowerset, j + 1 ) == 1 ) {
+                 && getBricks( prevpowerset, j + 1 ) == 1 ) {
                 fill(
                     prevpowerset,
                     setBricks(
@@ -78,7 +86,8 @@ int fill( int prevpowerset, int currentpowerset, int j ) {
             //
             // = =
             // = _
-            if ( j != C - 1 && bricks( prevpowerset, j + 1 ) == 1 ) {
+            if ( j != C - 1
+                 && getBricks( prevpowerset, j + 1 ) == 1 ) {
                 fill(
                     setBricks( prevpowerset, j + 1, 0 ),
                     setBricks( currentpowerset, j, 0 ),
@@ -87,7 +96,8 @@ int fill( int prevpowerset, int currentpowerset, int j ) {
             }
             // = _ 
             // = =
-            if ( j != C - 1 && bricks( prevpowerset, j + 1 ) == 1 ) {
+            if ( j != C - 1
+                && getBricks( prevpowerset, j + 1 ) == 1 ) {
                 fill(
                     prevpowerset,
                     setBricks(
@@ -100,7 +110,8 @@ int fill( int prevpowerset, int currentpowerset, int j ) {
             }
             // = = 
             // _ =
-            if ( j != C - 1 && bricks( prevpowerset, j + 1 ) == 0 ) {
+            if ( j != C - 1
+                 && getBricks( prevpowerset, j + 1 ) == 0 ) {
                 fill(
                     prevpowerset,
                     setBricks(
@@ -124,12 +135,14 @@ void dynamic() {
     buckets = temp;
 
     for ( int powerset = 0; powerset < powersets; ++powerset ) {
-        fill( powerset, ( 1 << ( 2 * C ) ) - 1 ); // 0xfff...f w/ 2c binary digits
+        fill( powerset, ( 1 << ( 2 * C ) ) - 1, 0 ); // 0xfff...f w/ 2c binary digits
     }
 }
 
 int main() {
     int i = 0;
+
+    printf( "Number of powersets per induction step: %i\n", powersets );
 
     buckets = ( int* )malloc( powersets * sizeof( int ) );
     prevbuckets = ( int* )malloc( powersets * sizeof( int ) );
@@ -139,9 +152,12 @@ int main() {
     }
     buckets[ 0 ] = 1;
 
+    printBuckets();
     for ( i = 0; i < N; ++i ) {
+        printf( "Populating powersets introducing column %i\n", i );
         dynamic();
     }
+    printBuckets();
 
     printf( "%i", buckets[ 0 ] );
 
