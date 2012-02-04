@@ -18,7 +18,7 @@ const int SHAPE_MIRRORL = 4;
 const int SHAPE_GAMMA = 5;
 const int SHAPE_MIRRORGAMMA = 6;
 
-int C = 3, N = 3;
+int C = 9, N = 12;
 LL powersets = 1 << ( 2 * C );
 LL prevpowersetcount;
 int prevpowersetUntouched;
@@ -103,10 +103,10 @@ void printShapes( stack< shape > s ) {
     printf( "\n" );
 }
 
-void fill( int prevpowerset, int currentpowerset, int j ) { //, stack< shape > s ) {
+void fill( int prevpowerset, int currentpowerset, int j ) { // , stack< shape > s ) {
     if ( j == C ) {
         buckets[ currentpowerset ] += prevpowersetcount;
-        // if ( currentpowerset == 0 && inductionStep == 1 ) {
+        // if ( currentpowerset == 0 && inductionStep == N - 1 ) {
         //     printBinary( prevpowersetUntouched );
         //     printf( " -> " );
         //     printBinary( currentpowerset );
@@ -141,7 +141,8 @@ void fill( int prevpowerset, int currentpowerset, int j ) { //, stack< shape > s
                     );
                     // s.pop();
                 }
-                else if ( getBricks( prevpowerset, j + 2 ) == 1 && j + 4 <= C ) {
+                else if (    getBricks( prevpowerset, j + 2 ) == 1 && j + 4 <= C
+                          && getBricks( prevpowerset, j + 3 ) == 1 ) {
                     // s.push( make_shape( j, SHAPE_I ) );
                     // s.push( make_shape( j + 3, SHAPE_L ) );
                     fill(
@@ -204,7 +205,7 @@ void fill( int prevpowerset, int currentpowerset, int j ) { //, stack< shape > s
                 fill(
                     setBricks( prevpowerset, j + 1, 0 ),
                     setBricks( currentpowerset, j, 0 ),
-                    j + 1 //, s
+                    j + 1 // , s
                 );
                 // s.pop();
             }
@@ -219,7 +220,7 @@ void fill( int prevpowerset, int currentpowerset, int j ) { //, stack< shape > s
                         setBricks(
                             currentpowerset, j, 1
                         ), j + 1, 0
-                    ), j + 2 //, s
+                    ), j + 2 // , s
                 );
                 // s.pop();
             }
@@ -235,12 +236,12 @@ void fill( int prevpowerset, int currentpowerset, int j ) { //, stack< shape > s
                                 setBricks(
                                     currentpowerset, j, 0
                                 ), j + 1, 0
-                            ), j + 2 //, s
+                            ), j + 2 // , s
                         );
                         // s.pop();
                         break;
                     case 1:
-                        if ( j + 3 <= C ) {
+                        if ( j + 3 <= C && getBricks( prevpowerset, j + 2 ) == 1 ) {
                             // s.push( make_shape( j, SHAPE_MIRRORGAMMA ) );
                             // s.push( make_shape( j + 1, SHAPE_L ) );
                             fill(
@@ -251,7 +252,7 @@ void fill( int prevpowerset, int currentpowerset, int j ) { //, stack< shape > s
                                             currentpowerset, j, 0
                                         ), j + 1, 0
                                     ), j + 2, 0
-                                ), j + 3 //, s
+                                ), j + 3 // , s
                             );
                             // s.pop();
                             // s.pop();
@@ -266,7 +267,7 @@ void fill( int prevpowerset, int currentpowerset, int j ) { //, stack< shape > s
             prevpowerset,
             setBricks(
                 currentpowerset, j, thisBricks == 1? 3: 1
-            ), j + 1 //, s
+            ), j + 1 // , s
         );
     }
 }
