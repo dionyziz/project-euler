@@ -1,79 +1,93 @@
 #include <cstdio>
 #include <cstdlib>
-#include <vector>
+#include <cassert>
+#include <set>
 
 using namespace std;
 
-int N = 1000;
+typedef unsigned long long int LL;
 
-struct fraction {
-    int n;
-    int d;
-};
+const int N = 1000000;
 
-vector< int > primes;
+set< int > primes;
+int* divisor;
+int* phi;
 
-inline bool operator < ( fraction a, fraction b ) {
-    return ( long long )a.n * b.d - ( long long )b.n * a.d < 0;
+int gcd( int a, int b ) {
+    assert( a <= b );
+    if ( a == 0 ) {
+        return b;
+    }
+    return gcd( b % a, a );
 }
 
-inline fraction make( int n, int d ) {
-    fraction f;
+void eratosthenes() {
+    bool prime;
 
-    f.n = n; f.d = d;
-
-    return f;
-}
-
-void generatePrimes() {
-    bool isPrime;
-
-    primes.push_back( 2 );
-
-    for ( int i = 3; i < N; i += 2 ) {
-        isPrime = true;
-        for ( vector< int >::iterator it = primes.begin(); it != primes.end() && ( *it ) * ( *it ) <= i; ++it ) {
-            if ( i % *it == 0 ) {
-                isPrime = false;
+    primes.insert( 2 );
+    for ( int candidate = 3; candidate <= N; ++candidate ) {
+        if ( candidate % 10000 == 1 ) {
+            printf( "\rFinding primes... %i%%", ( ( LL )100 * candidate / N ) );
+        }
+        prime = true;
+        for ( set< int >::iterator disprover = primes.begin(); disprover != primes.end(); ++disprover ) {
+            assert( *disprover < candidate );
+            if ( ( *disprover ) * ( *disprover ) > N ) {
+                break;
+            }
+            if ( candidate % *disprover == 0 ) {
+                divisor[ candidate ] = *disprover;
+                prime = false;
                 break;
             }
         }
-        if ( isPrime ) {
-            primes.push_back( i );
+        if ( prime ) {
+            primes.insert( candidate );
+            divisor[ candidate ] = candidate;
         }
     }
+    printf( "\rFinding primes... 100%%\n" );
 }
 
-inline bool reduced( fraction f ) {
-    for ( vector< int >::iterator it = primes.begin(); it != primes.end() && *it <= f.n; ++it ) {
-        if ( f.n % *it == 0 && f.d % *it == 0 ) {
-            return false;
+void calcPhi() {
+    // evaluate phi for all numbers of interest
+    // use dynamic programming to find phi
+    phi[ 1 ] = 1;
+    for ( int n = 2; n <= N; ++n ) {
+        if ( n % 50000 == 0 ) {
+            printf( "\rCalculating phi... %i%%", ( ( LL )100 * n / N ) );
+        }
+        if ( primes.find( n ) != primes.end() ) {
+            // n is a prime
+            phi[ n ] = n - 1;
+        }
+        else {
+            // n is composite
+            // phi( p * q ) = phi( p ) * phi( q ) * gcd( p, q ) / phi( gcd( p, q ) )
+            int p = divisor[ n ];
+            int q = n / p;
+            int d = gcd( p, q );
+            phi[ n ] = ( LL )phi[ p ] * phi[ q ] * d / phi[ d ];
         }
     }
-    return true;
+    printf( "\rCalculating phi... 100%%\n" );
 }
 
-int main( int argc, char* argv[] ) {
-    long long int c = 0;
-    fraction f;
+int main() {
+    LL sum = 0;
 
-    N = atoi( argv[ 1 ] );
+    phi = ( int* )malloc( ( N + 1 ) * sizeof ( int ) );
+    divisor = ( int* )malloc( ( N + 1 ) * sizeof ( int ) );
 
-    // printf( "Generating primes...\n" );
-    generatePrimes();
+    eratosthenes();
+    calcPhi();
 
-    for ( int n = 1; n <= N; ++n ) {
-        if ( n % 1000 == 0 ) {
-            printf( "%2.2f%%...\n", ( float )( 100 * n ) / N );
-        }
-        for ( int d = n + 1; d <= N; ++d ) {
-            f = make( n, d );
-            if ( reduced( f ) ) {
-                c++;
-            }
-        }
+    for ( int i = 1; i <= N; ++i ) {
+        // calculate phi series
+        sum += ( LL )phi[ i ];
     }
-    // printf( "\n" );
-    printf( "%i\n", c );
+
+    printf( "Solution: %llu\n", ( sum + 1 ) - 2 );
+
     return 0;
 }
