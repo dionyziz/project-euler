@@ -21,28 +21,7 @@ int gcd( int a, int b ) {
     return gcd( b % a, a );
 }
 
-inline int getDivisor( int candidate ) {
-    // sieve of eratosthenes primality check and return divisor
-    bool prime;
-
-    if ( candidate % 2 == 0 ) {
-        return 2;
-    }
-
-    prime = true;
-    for ( set< int >::iterator disprover = primes.begin(); disprover != primes.end(); ++disprover ) {
-        assert( *disprover < candidate );
-        if ( ( *disprover ) * ( *disprover ) > candidate ) {
-            break;
-        }
-        if ( candidate % *disprover == 0 ) {
-            return *disprover;
-        }
-    }
-    if ( prime ) {
-        primes.insert( candidate );
-        return candidate;
-    }
+inline int phi( factorization n ) {
 }
 
 int main() {
