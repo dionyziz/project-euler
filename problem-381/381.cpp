@@ -1,48 +1,43 @@
 #include "euclidean.h"
+#include "millerrabin.h"
+#include <cassert>
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
 #include <set>
 #include <utility>
+#include <ctime>
+
+typedef unsigned long long int lli;
 
 using namespace std;
 
+inline int S( lli p ) {
+    lli s, fact;
+
+    s = fact = p - 1;
+    for ( int k = p - 1; k > p - 5; --k ) {
+        int inv = inverse( k, p );
+        // assert( inv >= 0 );
+        fact = ( fact * inv ) % p;
+        s = ( s + fact ) % p;
+    }
+    return s;
+}
+
 int main() {
-    int solution = 0;
-    int N = pow( 10, 8 );
-    int* primes;
-    int numPrimes = 2;
+    lli solution = 0;
+    int progress = 0;
+    lli N = pow( 10, 8 );
 
-    primes = ( int* )malloc( 6000000 * sizeof( int ) );
-    primes[ 0 ] = 2;
-    primes[ 1 ] = 3;
-
-    for ( long long int p = 5; p < N; p += 2 ) {
-        bool found = true;
-        for ( int prime = 0; prime < numPrimes; ++prime ) {
-            if ( p % primes[ prime ] == 0 ) {
-                found = false;
-                break;
-            }
-            if ( primes[ prime ] * primes[ prime ] > p ) {
-                break;
-            }
-        }
-        if ( found ) {
-            primes[ numPrimes ] = p;
-            ++numPrimes;
-            int s, fact;
-            s = fact = p - 1;
-            for ( int k = p - 1; k > p - 5; --k ) {
-                int inv = inverse( k, p );
-                fact = ( fact * inv ) % p;
-                s = ( s + fact ) % p;
-            }
-            solution += s;
+    for ( int p = 5; p < N; p += 2 ) {
+        if ( isPrime( p ) ) {
+            solution += S( p );
         }
         if ( p % 1000000 == 1 ) {
-            printf( "Progress: %i%%\n", 100 * p / N );
+            printf( "Progress: %i%%\n", progress );
+            ++progress;
         }
     }
-    printf( "%i\n", solution );
+    printf( "%llu\n", solution );
 }

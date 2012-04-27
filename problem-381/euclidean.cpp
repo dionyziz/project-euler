@@ -1,15 +1,31 @@
 #include "euclidean.h"
 
-pair< int, int > extended( int a, int b ) {
-    if ( b == 0 ) {
-        return make_pair( 1, 0 );
+using namespace std;
+
+typedef unsigned long long int lli;
+
+void extended( int a, int b, int* s, int* t ) {
+    lli x = 0, y = 1, lastx = 1, lasty = 0, q, temp;
+
+    while ( b != 0 ) {
+        q = a / b;
+        temp = b;
+        b = a % b;
+        a = temp;
+        temp = x;
+        x = lastx - q * x;
+        lastx = temp;
+        temp = y;
+        y = lasty - q * y;
+        lasty = temp;
     }
-    pair< int, int > p = extended( b, a % b );
-    int s = p.first;
-    int t = p.second;
-    return make_pair( t, s - ( a / b ) * t );
+    *s = lastx;
+    *t = lasty;
 }
 
 int inverse( int a, int p ) {
-    return ( p + extended( a, p ).first ) % p;
+    int s, t;
+
+    extended( a, p, &s, &t );
+    return ( p + s ) % p;
 }

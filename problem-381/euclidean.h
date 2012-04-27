@@ -5,7 +5,8 @@
 
 using namespace std;
 
+typedef unsigned long long int lli;
+
 int inverse( int, int );
-pair< int, int > extended( int, int );
 
 #endif
