@@ -39,6 +39,7 @@ int prim() {
     for ( list< edge >::iterator it = E[ 0 ].begin(); it != E[ 0 ].end(); ++it ) {
         q.push( *it );
     }
+    visited.insert( 0 );
     while ( !q.empty() ) {
         e = q.top();
         q.pop();
@@ -71,14 +72,12 @@ int main() {
                 fscanf( in, "," );
             }
             if ( w > -1 ) {
-                // printf( "%i ", w );
                 oldcost += w;
                 E[ u ].push_back( makeEdge( u, v, w ) );
-                E[ v ].push_back( makeEdge( v, u, w ) );
             }
         }
-        // printf( "\n" );
     }
+    oldcost /= 2;
     newcost = prim();
     printf( "Original cost: %i\n", oldcost );
     printf( "MST cost: %i\n", newcost );
