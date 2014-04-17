@@ -1,1 +1,4 @@
-head [a * b * c|a <- [1..1000], b <- [a..1000], let c = 1000 - a - b, b < c, a^2 + b^2 == c^2]
+main = do
+    contents <- getContents
+    let numbers = map read $ concat $ map (map (:[])) (lines contents) :: [Int]
+    print $ maximum $ map (product . take 5) $ scanr (:) [] numbers
