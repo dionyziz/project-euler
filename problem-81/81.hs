@@ -8,5 +8,5 @@ foldCol (a:as) (dp, elem) = (min a dp) + elem:a:as
 
 main = do
     contents <- getContents
-    let input = map (map read) $ map (splitOn ",") $ lines contents :: [[Int]]
+    let input = map (map read . splitOn ",") $ lines contents :: [[Int]]
     print $ last $ foldl foldRow (scanl1 (+) $ head input) $ tail input
